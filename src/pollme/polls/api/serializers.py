@@ -1,4 +1,4 @@
-
+from rest_framework import serializers
 from rest_framework.serializers import (
     ModelSerializer,
     SerializerMethodField
@@ -16,10 +16,20 @@ class QuestionListSerializer(ModelSerializer):
     Reference this stack overflow for the choices:
         https://stackoverflow.com/questions/33945148/return-nested-serializer-in-serializer-method-field
     """
-    pass
+    choice = SerializerMethodField(source='get_choice')
+
+    class Meta:
+        model = Question
+        fields = ('id', 'text', 'pub_date', 'choice')
+
+    def get_choice(self, obj):
+        return ChoiceSerializer(obj.choice_set.all(), many = True).data
 
 class ChoiceSerializer(ModelSerializer):
     """
     This serializes the Choice model
     """
-    pass
+
+    class Meta:
+        model = Choice
+        fields = ('choice_text', 'votes')
